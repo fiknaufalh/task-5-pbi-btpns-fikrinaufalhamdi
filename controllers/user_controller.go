@@ -20,8 +20,8 @@ func GetAllUsers(c *gin.Context) {
 	database.DB.Find(&users)
 
 	c.JSON(http.StatusOK, gin.H{
-		"status":  "success",
-		"message": "fetch all users",
+		"status":  "Succeed",
+		"message": "Fetch all users",
 		"data":    users,
 	})
 }
@@ -32,7 +32,7 @@ func GetUserbyID(c *gin.Context) {
 	userID, err := strconv.Atoi(c.Param("id"))
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{
-			"status":  "fail",
+			"status":  "Failed",
 			"message": "ID is not valid",
 		})
 		return
@@ -42,13 +42,13 @@ func GetUserbyID(c *gin.Context) {
 		switch err {
 		case gorm.ErrRecordNotFound:
 			c.AbortWithStatusJSON(http.StatusNotFound, gin.H{
-				"status":  "fail",
+				"status":  "Failed",
 				"message": "Data not found",
 			})
 			return
 		default:
 			c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{
-				"status":  "fail",
+				"status":  "Failed",
 				"message": err.Error(),
 			})
 			return
@@ -56,7 +56,7 @@ func GetUserbyID(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, gin.H{
-		"status":  "success",
+		"status":  "Succeed",
 		"message": "Fetch a user",
 		"data":    user,
 	})
@@ -67,7 +67,7 @@ func UpdateUser(c *gin.Context) {
 	userID, err := strconv.Atoi(c.Param("id"))
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{
-			"status":  "fail",
+			"status":  "Failed",
 			"message": "ID is not valid",
 		})
 		return
@@ -77,7 +77,7 @@ func UpdateUser(c *gin.Context) {
 
 	if err := c.ShouldBindJSON(&userReq); err != nil {
 		c.AbortWithStatusJSON(400, gin.H{
-			"status":  "fail",
+			"status":  "Failed",
 			"message": err.Error(),
 		})
 		return
@@ -85,7 +85,7 @@ func UpdateUser(c *gin.Context) {
 
 	if _, err := govalidator.ValidateStruct(userReq); err != nil {
 		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{
-			"status":  "fail",
+			"status":  "Failed",
 			"message": err.Error(),
 		})
 		return
@@ -94,7 +94,7 @@ func UpdateUser(c *gin.Context) {
 	hashPassword, err := helpers.HashPassword(userReq.Password)
 	if err != nil {
 		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{
-			"status":  "fail",
+			"status":  "Failed",
 			"message": err.Error(),
 		})
 		return
@@ -109,8 +109,8 @@ func UpdateUser(c *gin.Context) {
 
 	if database.DB.Model(&userModel).Where("id = ?", userID).Updates(&userModel).RowsAffected == 0 {
 		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{
-			"message": "failed to update data",
-			"status":  "fail",
+			"message": "Failed to update data",
+			"status":  "Failed",
 		})
 		return
 	}
@@ -118,7 +118,7 @@ func UpdateUser(c *gin.Context) {
 	c.Set("user", nil)
 
 	c.JSON(http.StatusOK, gin.H{
-		"status":  "Success",
+		"status":  "Succeed",
 		"message": "Success update data",
 	})
 
@@ -128,7 +128,7 @@ func DeleteUser(c *gin.Context) {
 	userID, err := strconv.Atoi(c.Param("id"))
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{
-			"status":  "fail",
+			"status":  "Failed",
 			"message": "ID is not valid",
 		})
 		return
@@ -138,8 +138,8 @@ func DeleteUser(c *gin.Context) {
 
 	if database.DB.Unscoped().Delete(&user, userID).RowsAffected == 0 {
 		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{
-			"status":  "fail",
-			"message": "failed to delete data",
+			"status":  "Failed",
+			"message": "Failed to delete data",
 		})
 		return
 	}
@@ -148,7 +148,7 @@ func DeleteUser(c *gin.Context) {
 	c.SetCookie("Authorization", "", -1, "", "", true, true)
 
 	c.JSON(200, gin.H{
-		"status":  "success",
-		"message": "success delete data",
+		"status":  "Succeed",
+		"message": "Success delete data",
 	})
 }
